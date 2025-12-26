@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon, SecurityCheckIcon } from '@hugeicons/core-free-icons'
 import { ReevitCheckout } from '@reevit/react'
+import '@reevit/react/styles.css'
 import { useCart } from '@/lib/cart'
 import { formatPrice } from '@/lib/products'
 import { toast } from '@/components/Toaster'
@@ -29,6 +30,7 @@ export default function CheckoutPage() {
 
   const selectedCountryData = countries.find((c) => c.code === selectedCountry)
   const publicKey = process.env.NEXT_PUBLIC_REEVIT_PUBLIC_KEY || 'pk_test_demo'
+  const apiBaseUrl = process.env.NEXT_PUBLIC_REEVIT_API_URL
 
   if (items.length === 0) {
     return (
@@ -204,6 +206,7 @@ export default function CheckoutPage() {
                   primaryColor: '#ea580c',
                   darkMode: false,
                 }}
+                apiBaseUrl={apiBaseUrl}
               >
                 <Button className="w-full" size="lg">
                   Pay {formatPrice(total, selectedCountryData?.currency)}
