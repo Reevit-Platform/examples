@@ -8,6 +8,7 @@ class CreatePaymentRequest(BaseModel):
     method: str = "card"
     country: str = "GH"
     customer_id: Optional[str] = None
+    reference: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
 
 
@@ -18,6 +19,7 @@ class PaymentResponse(BaseModel):
     currency: str
     provider: Optional[str] = None
     customer_id: Optional[str] = None
+    reference: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
 
 

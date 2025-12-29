@@ -30,6 +30,7 @@ class PaymentController
             'method' => $data['method'] ?? 'card',
             'country' => $data['country'] ?? 'GH',
             'customer_id' => $data['customer_id'] ?? null,
+            'reference' => $data['reference'] ?? null,
             'metadata' => $data['metadata'] ?? [],
         ]);
 

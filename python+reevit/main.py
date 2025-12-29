@@ -54,6 +54,7 @@ async def create_payment(request: CreatePaymentRequest):
             "method": request.method,
             "country": request.country,
             "customer_id": request.customer_id,
+            "reference": request.reference,
             "metadata": request.metadata or {}
         })
         
@@ -66,6 +67,7 @@ async def create_payment(request: CreatePaymentRequest):
             currency=payment["currency"],
             provider=payment.get("provider"),
             customer_id=payment.get("customer_id"),
+            reference=payment.get("reference"),
             metadata=payment.get("metadata")
         )
     except Exception as e:
@@ -88,6 +90,7 @@ async def get_payment(payment_id: str):
             currency=payment["currency"],
             provider=payment.get("provider"),
             customer_id=payment.get("customer_id"),
+            reference=payment.get("reference"),
             metadata=payment.get("metadata")
         )
     except Exception as e:
