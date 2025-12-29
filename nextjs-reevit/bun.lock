@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "nextjs-reevit",
@@ -7,7 +8,7 @@
         "@base-ui/react": "^1.0.0",
         "@hugeicons/core-free-icons": "^3.1.0",
         "@hugeicons/react": "^1.1.4",
-        "@reevit/react": "0.2.5",
+        "@reevit/react": "0.3.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "next": "16.1.1",
@@ -270,7 +271,7 @@
 
     "@open-draft/until": ["@open-draft/until@2.1.0", "", {}, "sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg=="],
 
-    "@reevit/react": ["@reevit/react@0.2.5", "", { "peerDependencies": { "react": ">=18.0.0", "react-dom": ">=18.0.0" } }, "sha512-AfZ3vQWIIFzKsr6Wmtd+oW9UOeRiGavF8ijmyQx91aCPZONBXCA4z96NR27zz9NBb4lXVrntrOemnxEoNMuLWA=="],
+    "@reevit/react": ["@reevit/react@0.3.0", "", { "peerDependencies": { "react": ">=18.0.0", "react-dom": ">=18.0.0" } }, "sha512-Dm6UCtrLzQcyBuK6bVgzgIMSBwxv9iE44sIUAeBF2ccThpBq2Kxa4MPT6ISNIZhInaXTbr35qU+YBrNIdEVswg=="],
 
     "@rtsao/scc": ["@rtsao/scc@1.1.0", "", {}, "sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g=="],
 

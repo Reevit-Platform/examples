@@ -198,6 +198,12 @@ export default function CheckoutPage() {
                 metadata={{
                   customer_name: customerName,
                   order_items: items.map((i) => i.product.id).join(','),
+                  // IMPORTANT: These values are required for webhook routing
+                  // Get your org_id and connection_id from your Reevit dashboard
+                  org_id: process.env.NEXT_PUBLIC_REEVIT_ORG_ID || "your-organization-id",
+                  connection_id: process.env.NEXT_PUBLIC_REEVIT_CONNECTION_ID || "your-connection-id",
+                  // payment_id is typically the order/invoice ID from your system
+                  payment_id: `ORD-${Date.now()}`
                 }}
                 paymentMethods={['card', 'mobile_money']}
                 onSuccess={handlePaymentSuccess}
