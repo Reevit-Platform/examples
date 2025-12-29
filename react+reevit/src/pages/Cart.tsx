@@ -11,7 +11,7 @@ export default function Cart() {
       <main className="container mx-auto px-6 py-24 text-center">
         <div className="text-6xl mb-6">🛒</div>
         <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
-        <p className="text-[var(--color-muted-foreground)] mb-8">
+        <p className="text-muted-foreground mb-8">
           Add some products to get started
         </p>
         <Link to="/" className="btn btn-primary h-12 px-8 text-lg">
@@ -48,7 +48,7 @@ export default function Cart() {
               {/* Details */}
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-lg mb-1">{item.product.name}</h3>
-                <p className="text-sm text-[var(--color-muted-foreground)] line-clamp-1 mb-3">
+                <p className="text-sm text-muted-foreground line-clamp-1 mb-3">
                   {item.product.description}
                 </p>
 
@@ -72,12 +72,12 @@ export default function Cart() {
 
               {/* Price & Remove */}
               <div className="flex flex-col items-end justify-between">
-                <span className="font-bold text-lg text-[var(--color-accent)]">
+                <span className="font-bold text-lg text-accent">
                   {formatPrice(item.product.price * item.quantity, item.product.currency)}
                 </span>
                 <button
                   onClick={() => removeItem(item.product.id)}
-                  className="text-[var(--color-error)] hover:bg-[var(--color-error)]/10 p-2 rounded-lg transition-colors"
+                  className="text-error hover:bg-error/10 p-2 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -92,20 +92,20 @@ export default function Cart() {
             <h2 className="text-xl font-bold mb-6">Order Summary</h2>
 
             <div className="space-y-4 mb-6">
-              <div className="flex justify-between text-[var(--color-muted-foreground)]">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
-                <span className="text-[var(--color-foreground)] font-medium">
+                <span className="text-foreground font-medium">
                   {formatPrice(total)}
                 </span>
               </div>
-              <div className="flex justify-between text-[var(--color-muted-foreground)]">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Shipping</span>
-                <span className="text-[var(--color-success)] font-bold">Free</span>
+                <span className="text-success font-bold">Free</span>
               </div>
-              <div className="h-px bg-[var(--color-border)]" />
+              <div className="h-px bg-border" />
               <div className="flex justify-between">
                 <span className="text-lg font-bold">Total</span>
-                <span className="text-2xl font-extrabold text-[var(--color-accent)]">
+                <span className="text-2xl font-extrabold text-accent">
                   {formatPrice(total)}
                 </span>
               </div>
@@ -119,7 +119,7 @@ export default function Cart() {
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
 
-            <p className="mt-6 text-xs text-center text-[var(--color-muted-foreground)]">
+            <p className="mt-6 text-xs text-center text-muted-foreground">
               🔒 Secured by Reevit
             </p>
           </div>

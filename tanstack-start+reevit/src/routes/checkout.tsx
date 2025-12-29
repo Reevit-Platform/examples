@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft02Icon, SecurityCheckIcon } from '@hugeicons/react'
+import { ArrowLeft02Icon, SecurityCheckIcon } from '@hugeicons/core-free-icons'
 import { ReevitCheckout } from '@reevit/react'
 import { useCart } from '../lib/cart'
 import { formatPrice } from '../lib/products'
@@ -11,6 +11,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { Separator } from '../components/ui/separator'
+import { HugeiconsIcon } from '@hugeicons/react'
 
 const countries = [
   { code: 'GH', name: 'Ghana', currency: 'GHS' },
@@ -29,6 +30,7 @@ function CheckoutPage() {
 
   const selectedCountryData = countries.find((c) => c.code === selectedCountry)
   const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pk_test_demo'
+  const orderId = useMemo(() => `ORD-${Date.now()}`, [])
 
   if (items.length === 0) {
     return (
@@ -38,7 +40,7 @@ function CheckoutPage() {
         <p className="text-muted-foreground mb-8">Add some products before checking out</p>
         <Link to="/">
           <Button size="lg">
-            <ArrowLeft02Icon className="mr-2 h-5 w-5" />
+            <HugeiconsIcon icon={ArrowLeft02Icon} className="mr-2 h-5 w-5" />
             Continue Shopping
           </Button>
         </Link>
@@ -61,7 +63,7 @@ function CheckoutPage() {
       <div className="flex items-center gap-4 mb-8">
         <Link to="/cart">
           <Button variant="ghost" size="icon">
-            <ArrowLeft02Icon className="h-5 w-5" />
+            <HugeiconsIcon icon={ArrowLeft02Icon} className="h-5 w-5" />
           </Button>
         </Link>
         <h1 className="text-3xl font-bold">Checkout</h1>
@@ -119,10 +121,10 @@ function CheckoutPage() {
           </Card>
 
           {/* Security Notice */}
-          <Card className="border-primary/20 bg-primary/5">
+          <Card className="border border-primary/20 bg-primary/5">
             <CardContent className="flex items-start gap-4 p-4">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <SecurityCheckIcon className="h-5 w-5 text-primary" />
+                <HugeiconsIcon icon={SecurityCheckIcon} className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Secure Checkout</h3>
@@ -192,7 +194,7 @@ function CheckoutPage() {
                 amount={total}
                 currency={selectedCountryData?.currency || 'GHS'}
                 email={customerEmail}
-                reference={`ORD-${Date.now()}`}
+                reference={orderId}
                 metadata={{
                   customer_name: customerName,
                   order_items: items.map((i) => i.product.id).join(','),
@@ -201,7 +203,7 @@ function CheckoutPage() {
                   org_id: import.meta.env.VITE_REEVIT_ORG_ID || "your-organization-id",
                   connection_id: import.meta.env.VITE_REEVIT_CONNECTION_ID || "your-connection-id",
                   // payment_id is typically the order/invoice ID from your system
-                  payment_id: `ORD-${Date.now()}`
+                  payment_id: orderId
                 }}
                 paymentMethods={['card', 'mobile_money']}
                 onSuccess={handlePaymentSuccess}
