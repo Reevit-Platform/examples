@@ -28,6 +28,7 @@ type CreatePaymentRequest struct {
 	Method     string            `json:"method"`
 	Country    string            `json:"country"`
 	CustomerID string            `json:"customer_id,omitempty"`
+	Reference  string            `json:"reference,omitempty"`
 	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
@@ -67,6 +68,7 @@ func (s *Server) CreatePayment(w http.ResponseWriter, r *http.Request) {
 		Method:     req.Method,
 		Country:    req.Country,
 		CustomerID: req.CustomerID,
+		Reference:  req.Reference,
 		Metadata:   metadata,
 	})
 	if err != nil {
