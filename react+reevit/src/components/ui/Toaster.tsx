@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react'
+import { useState, useEffect } from 'react'
 import { CheckCircle, XCircle, Info, X } from 'lucide-react'
 
 interface Toast {
@@ -6,14 +6,6 @@ interface Toast {
   message: string
   type: 'success' | 'error' | 'info'
 }
-
-interface ToasterContextValue {
-  toasts: Toast[]
-  addToast: (message: string, type: Toast['type']) => void
-  removeToast: (id: string) => void
-}
-
-const ToasterContext = createContext<ToasterContextValue | null>(null)
 
 let toastHandler: ((message: string, type: Toast['type']) => void) | null = null
 

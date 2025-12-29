@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	reevit "github.com/Reevit-Platform/go-sdk"
 )
@@ -12,12 +14,14 @@ import (
 // Server handles HTTP requests
 type Server struct {
 	client *reevit.Client
+	orgID  string
 }
 
 // NewServer creates a new server instance
 func NewServer(apiKey, orgID string) *Server {
 	return &Server{
 		client: reevit.NewClient(apiKey, orgID),
+		orgID:  orgID,
 	}
 }
 
@@ -55,11 +59,18 @@ func (s *Server) CreatePayment(w http.ResponseWriter, r *http.Request) {
 		req.Country = "GH"
 	}
 
-	// Convert metadata to interface map
+	// convert metadata to interface map
 	metadata := make(map[string]interface{})
 	for k, v := range req.Metadata {
 		metadata[k] = v
 	}
+
+	// Ensure payment_id in metadata matches reference
+	if req.Reference == "" {
+		req.Reference = fmt.Sprintf("ORD-%d", time.Now().Unix())
+	}
+	metadata["payment_id"] = req.Reference
+	metadata["org_id"] = s.orgID // Ensure org_id is present for webhook routing
 
 	// Create payment intent via Reevit SDK
 	payment, err := s.client.Payments.CreateIntent(context.Background(), &reevit.PaymentIntentRequest{

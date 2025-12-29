@@ -21,7 +21,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Load environment variables
-$apiKey = getenv('REEVIT_API_KEY') ?: 'pk_test_demo';
+$apiKey = getenv('REEVIT_API_KEY') ?: 'pfk_test_demo';
 $webhookSecret = getenv('REEVIT_WEBHOOK_SECRET') ?: '';
 
 // Initialize controllers

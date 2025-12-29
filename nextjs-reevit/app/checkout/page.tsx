@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -29,8 +29,9 @@ export default function CheckoutPage() {
   const [selectedCountry, setSelectedCountry] = useState('GH')
 
   const selectedCountryData = countries.find((c) => c.code === selectedCountry)
-  const publicKey = process.env.NEXT_PUBLIC_REEVIT_PUBLIC_KEY || 'pk_test_demo'
+  const publicKey = process.env.NEXT_PUBLIC_REEVIT_PUBLIC_KEY || 'pfk_test_demo'
   const apiBaseUrl = process.env.NEXT_PUBLIC_REEVIT_API_URL
+  const orderId = useMemo(() => `ORD-${Date.now()}`, [])
 
   if (items.length === 0) {
     return (
@@ -194,7 +195,7 @@ export default function CheckoutPage() {
                 amount={total}
                 currency={selectedCountryData?.currency || 'GHS'}
                 email={customerEmail}
-                reference={`ORD-${Date.now()}`}
+                reference={orderId}
                 metadata={{
                   customer_name: customerName,
                   order_items: items.map((i) => i.product.id).join(','),
@@ -203,7 +204,7 @@ export default function CheckoutPage() {
                   org_id: process.env.NEXT_PUBLIC_REEVIT_ORG_ID || "your-organization-id",
                   connection_id: process.env.NEXT_PUBLIC_REEVIT_CONNECTION_ID || "your-connection-id",
                   // payment_id is typically the order/invoice ID from your system
-                  payment_id: `ORD-${Date.now()}`
+                  payment_id: orderId
                 }}
                 paymentMethods={['card', 'mobile_money']}
                 onSuccess={handlePaymentSuccess}

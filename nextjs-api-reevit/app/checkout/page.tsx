@@ -1,17 +1,17 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft02Icon, SecurityCheckIcon } from '@hugeicons/core-free-icons'
-import { ReevitCheckout } from '@reevit/react'
-import { useCart } from '../lib/cart'
-import { formatPrice } from '../lib/products'
-import { toast } from '../components/Toaster'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Input } from '../components/ui/input'
-import { Separator } from '../components/ui/separator'
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { ArrowLeft02Icon, SecurityCheckIcon } from '@hugeicons/core-free-icons'
+import { useCart } from '@/lib/cart'
+import { formatPrice } from '@/lib/products'
+import { toast } from '@/components/Toaster'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 
 const countries = [
   { code: 'GH', name: 'Ghana', currency: 'GHS' },
@@ -19,18 +19,15 @@ const countries = [
   { code: 'KE', name: 'Kenya', currency: 'KES' },
 ]
 
-export const Route = createFileRoute('/checkout')({ component: CheckoutPage })
-
-function CheckoutPage() {
-  const navigate = useNavigate()
+export default function CheckoutPage() {
+  const router = useRouter()
   const { items, total, clearCart } = useCart()
   const [customerEmail, setCustomerEmail] = useState('')
   const [customerName, setCustomerName] = useState('')
   const [selectedCountry, setSelectedCountry] = useState('GH')
+  const [loading, setLoading] = useState(false)
 
   const selectedCountryData = countries.find((c) => c.code === selectedCountry)
-  const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pfk_test_demo'
-  const orderId = useMemo(() => `ORD-${Date.now()}`, [])
 
   if (items.length === 0) {
     return (
@@ -38,7 +35,7 @@ function CheckoutPage() {
         <div className="text-8xl mb-6">🛒</div>
         <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
         <p className="text-muted-foreground mb-8">Add some products before checking out</p>
-        <Link to="/">
+        <Link href="/">
           <Button size="lg">
             <HugeiconsIcon icon={ArrowLeft02Icon} className="mr-2 h-5 w-5" />
             Continue Shopping
@@ -48,30 +45,68 @@ function CheckoutPage() {
     )
   }
 
-  const handlePaymentSuccess = (result: { reference?: string; id?: string }) => {
-    toast.success('Payment successful!')
-    clearCart()
-    navigate({ to: '/payment/$id', params: { id: result.reference || result.id || 'unknown' } })
-  }
+  const handleCheckout = async () => {
+    if (!customerEmail || !customerName) {
+      toast.error('Please fill in your details')
+      return
+    }
 
-  const handlePaymentError = (error: { message?: string }) => {
-    toast.error(error.message || 'Payment failed')
+    setLoading(true)
+    const orderId = `ORD-${Date.now()}`
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_REEVIT_BASE_URL || 'http://localhost:8080'}/v1/payments/intents`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Reevit-Key': process.env.NEXT_PUBLIC_REEVIT_PUBLIC_KEY || 'pfk_test_demo',
+          'X-Org-Id': process.env.NEXT_PUBLIC_REEVIT_ORG_ID || 'your-org-id',
+        },
+        body: JSON.stringify({
+          amount: total,
+          currency: selectedCountryData?.currency || 'GHS',
+          method: 'card',
+          country: selectedCountry,
+          reference: orderId,
+          metadata: {
+            customer_name: customerName,
+            customer_email: customerEmail,
+            order_items: items.map((i) => i.product.id).join(','),
+            org_id: process.env.NEXT_PUBLIC_REEVIT_ORG_ID || "your-organization-id",
+            connection_id: process.env.NEXT_PUBLIC_REEVIT_CONNECTION_ID || "your-connection-id",
+            payment_id: orderId
+          },
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to initiate checkout')
+      }
+
+      toast.success('Payment initiated via API!')
+      clearCart()
+      router.push(`/payment/${data.id || 'success'}`)
+    } catch (error: any) {
+      toast.error(error.message || 'Checkout failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex items-center gap-4 mb-8">
-        <Link to="/cart">
+        <Link href="/cart">
           <Button variant="ghost" size="icon">
             <HugeiconsIcon icon={ArrowLeft02Icon} className="h-5 w-5" />
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">Checkout</h1>
+        <h1 className="text-3xl font-bold">Checkout (Direct API)</h1>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          {/* Customer Information */}
           <Card>
             <CardHeader>
               <CardTitle>Customer Information</CardTitle>
@@ -120,32 +155,27 @@ function CheckoutPage() {
             </CardContent>
           </Card>
 
-          {/* Security Notice */}
-          <Card className="border border-primary/20 bg-primary/5">
+          <Card className="border-primary/20 bg-primary/5">
             <CardContent className="flex items-start gap-4 p-4">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <HugeiconsIcon icon={SecurityCheckIcon} className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Secure Checkout</h3>
+                <h3 className="font-semibold mb-1">Secure Direct API Checkout</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your payment is securely processed through{' '}
-                  <span className="text-primary font-medium">Reevit's</span> unified
-                  payment platform. We automatically route to the best provider.
+                  Your payment is processed via direct <span className="text-primary font-medium">REST API</span> calls.
                 </p>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Order Summary */}
         <div className="lg:sticky lg:top-24 h-fit">
           <Card>
             <CardHeader>
               <CardTitle>Order Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Items */}
               <div className="space-y-3">
                 {items.map((item) => (
                   <div key={item.product.id} className="flex items-center gap-3">
@@ -169,7 +199,6 @@ function CheckoutPage() {
 
               <Separator />
 
-              {/* Totals */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
@@ -188,35 +217,14 @@ function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Reevit Checkout */}
-              <ReevitCheckout
-                publicKey={publicKey}
-                amount={total}
-                currency={selectedCountryData?.currency || 'GHS'}
-                email={customerEmail}
-                reference={orderId}
-                metadata={{
-                  customer_name: customerName,
-                  order_items: items.map((i) => i.product.id).join(','),
-                  // IMPORTANT: These values are required for webhook routing
-                  // Get your org_id and connection_id from your Reevit dashboard
-                  org_id: import.meta.env.VITE_REEVIT_ORG_ID || "your-organization-id",
-                  connection_id: import.meta.env.VITE_REEVIT_CONNECTION_ID || "your-connection-id",
-                  // payment_id is typically the order/invoice ID from your system
-                  payment_id: orderId
-                }}
-                paymentMethods={['card', 'mobile_money']}
-                onSuccess={handlePaymentSuccess}
-                onError={handlePaymentError}
-                theme={{
-                  primaryColor: '#ea580c',
-                  darkMode: false,
-                }}
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handleCheckout}
+                disabled={loading}
               >
-                <Button className="w-full" size="lg">
-                  Pay {formatPrice(total, selectedCountryData?.currency)}
-                </Button>
-              </ReevitCheckout>
+                {loading ? 'Processing...' : `Pay ${formatPrice(total, selectedCountryData?.currency)}`}
+              </Button>
 
               <p className="text-xs text-center text-muted-foreground">
                 🔒 100% Encrypted & Secure

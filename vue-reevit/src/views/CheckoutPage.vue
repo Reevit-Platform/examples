@@ -113,7 +113,7 @@
             :amount="cartStore.total"
             :currency="selectedCountryData?.currency || 'GHS'"
             :email="customerEmail"
-            :reference="`ORD-${Date.now()}`"
+            :reference="orderId"
             :metadata="{
               customer_name: customerName,
               order_items: cartStore.items.map(i => i.product.id).join(','),
@@ -122,7 +122,7 @@
               org_id: import.meta.env.VITE_REEVIT_ORG_ID || 'your-organization-id',
               connection_id: import.meta.env.VITE_REEVIT_CONNECTION_ID || 'your-connection-id',
               // payment_id is typically the order/invoice ID from your system
-              payment_id: `ORD-${Date.now()}`
+              payment_id: orderId
             }"
             :paymentMethods="['card', 'mobile_money']"
             :theme="{ primaryColor: '#ea580c', darkMode: false }"
@@ -158,6 +158,7 @@ const cartStore = useCartStore()
 const customerName = ref('')
 const customerEmail = ref('')
 const selectedCountry = ref('GH')
+const orderId = `ORD-${Date.now()}`
 
 const countries = [
   { code: 'GH', name: 'Ghana', currency: 'GHS' },
@@ -166,7 +167,7 @@ const countries = [
 ]
 
 const selectedCountryData = computed(() => countries.find(c => c.code === selectedCountry.value))
-const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pk_test_demo'
+const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pfk_test_demo'
 
 function handleSuccess(result: any) {
   cartStore.clearCart()

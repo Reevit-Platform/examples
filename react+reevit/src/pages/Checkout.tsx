@@ -20,7 +20,7 @@ export default function Checkout() {
   const [selectedCountry, setSelectedCountry] = useState('GH')
 
   const selectedCountryData = countries.find((c) => c.code === selectedCountry)
-  const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pk_test_demo'
+  const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pfk_test_demo'
   const [orderId] = useState(() => `ORD-${Date.now()}`)
 
   if (items.length === 0) {

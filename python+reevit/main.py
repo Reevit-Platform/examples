@@ -24,7 +24,7 @@ app = FastAPI(
 app.include_router(webhook_router)
 
 # Get API key
-api_key = os.getenv("REEVIT_API_KEY", "pk_test_demo")
+api_key = os.getenv("REEVIT_API_KEY", "pfk_test_demo")
 
 # Initialize Reevit client
 try:
@@ -48,14 +48,22 @@ async def create_payment(request: CreatePaymentRequest):
         raise HTTPException(status_code=503, detail="Reevit SDK not available")
     
     try:
+        # Generate reference if not provided
+        order_id = request.reference or f"ORD-{int(time.time())}"
+        
+        # Ensure metadata includes required fields for webhook routing
+        metadata = request.metadata or {}
+        metadata.setdefault("org_id", os.getenv("REEVIT_ORG_ID", "your-org-id"))
+        metadata.setdefault("payment_id", order_id)
+        
         payment = client.payments.create_intent({
             "amount": request.amount,
             "currency": request.currency,
             "method": request.method,
             "country": request.country,
             "customer_id": request.customer_id,
-            "reference": request.reference,
-            "metadata": request.metadata or {}
+            "reference": order_id,
+            "metadata": metadata
         })
         
         logger.info(f"[Payment] Created: {payment['id']} (Status: {payment['status']})")
