@@ -7,6 +7,7 @@
   let customerEmail = $state('')
   let customerName = $state('')
   let selectedCountry = $state('GH')
+  const orderId = `ORD-${Date.now()}`
 
   const countries = [
     { code: 'GH', name: 'Ghana', currency: 'GHS' },
@@ -15,7 +16,7 @@
   ]
 
   const selectedCountryData = $derived(countries.find((c) => c.code === selectedCountry))
-  const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pk_test_demo'
+  const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pfk_test_demo'
 
   function handlePaymentSuccess(event: CustomEvent) {
     const result = event.detail
@@ -126,7 +127,7 @@
             amount={cart.total}
             currency={selectedCountryData?.currency || 'GHS'}
             email={customerEmail}
-            reference={`ORD-${Date.now()}`}
+            reference={orderId}
             metadata={{
               customer_name: customerName,
               order_items: cart.items.map((i) => i.product.id).join(','),
@@ -135,7 +136,7 @@
               org_id: import.meta.env.VITE_REEVIT_ORG_ID || 'your-organization-id',
               connection_id: import.meta.env.VITE_REEVIT_CONNECTION_ID || 'your-connection-id',
               // payment_id is typically the order/invoice ID from your system
-              payment_id: `ORD-${Date.now()}`
+              payment_id: orderId
             }}
             paymentMethods={['card', 'mobile_money']}
             theme={{ primaryColor: '#6366f1', darkMode: true }}

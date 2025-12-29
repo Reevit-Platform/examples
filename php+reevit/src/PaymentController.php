@@ -23,6 +23,14 @@ class PaymentController
             throw new \InvalidArgumentException('Amount is required and must be positive');
         }
 
+        // Generate reference if not provided
+        $reference = $data['reference'] ?? 'ORD-' . time();
+
+        // Ensure metadata includes required fields for webhook routing
+        $metadata = $data['metadata'] ?? [];
+        $metadata['payment_id'] = $reference;
+        $metadata['org_id'] = getenv('REEVIT_ORG_ID') ?: 'your-org-id';
+
         // Create payment via Reevit SDK
         $payment = $this->client->payments->createIntent([
             'amount' => $data['amount'],
@@ -30,8 +38,8 @@ class PaymentController
             'method' => $data['method'] ?? 'card',
             'country' => $data['country'] ?? 'GH',
             'customer_id' => $data['customer_id'] ?? null,
-            'reference' => $data['reference'] ?? null,
-            'metadata' => $data['metadata'] ?? [],
+            'reference' => $reference,
+            'metadata' => $metadata,
         ]);
 
         error_log("[Payment] Created: {$payment['id']} (Status: {$payment['status']})");

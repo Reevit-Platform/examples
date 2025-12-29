@@ -11,7 +11,7 @@ func main() {
 	// Load environment variables
 	apiKey := os.Getenv("REEVIT_API_KEY")
 	if apiKey == "" {
-		apiKey = "pk_test_demo" // Default for development
+		apiKey = "pfk_test_demo" // Default for development
 	}
 	orgID := os.Getenv("REEVIT_ORG_ID")
 	if orgID == "" {
