@@ -13,7 +13,7 @@
     "check": "prettier --write . && eslint --fix"
   },
   "dependencies": {
-    "@reevit/react": "workspace:*",
+    "@reevit/react": "0.3.2",
     "@base-ui/react": "^1.0.0",
     "@fontsource-variable/inter": "^5.2.8",
     "@hugeicons/core-free-icons": "^3.1.0",
