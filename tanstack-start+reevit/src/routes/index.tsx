@@ -2,7 +2,7 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Settings02Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
+import { ArrowDown01Icon, Settings02Icon } from '@hugeicons/core-free-icons'
 import { products } from '../lib/products'
 import { ProductCard } from '../components/ProductCard'
 import { Button } from '../components/ui/button'

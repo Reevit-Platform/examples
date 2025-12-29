@@ -1,13 +1,13 @@
 'use client'
 
+import { HugeiconsIcon } from '@hugeicons/react'
+import { FavouriteIcon, ShoppingCart01Icon } from '@hugeicons/core-free-icons'
+import { formatPrice } from '../lib/products'
+import { useCart } from '../lib/cart'
 import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ShoppingCart01Icon, FavouriteIcon } from '@hugeicons/core-free-icons'
 import type { Product } from '../lib/products'
-import { formatPrice } from '../lib/products'
-import { useCart } from '../lib/cart'
 
 interface ProductCardProps {
   product: Product

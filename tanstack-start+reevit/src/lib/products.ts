@@ -12,7 +12,7 @@ export interface Product {
   badge?: string
 }
 
-export const products: Product[] = [
+export const products: Array<Product> = [
   {
     id: 'prod_1',
     name: 'Edinburgh Dining Chair',

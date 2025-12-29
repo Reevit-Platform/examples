@@ -19,7 +19,7 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Set environment variables
-export REEVIT_API_KEY=pk_test_xxx
+export REEVIT_API_KEY=pfk_test_xxx
 export REEVIT_WEBHOOK_SECRET=whsec_xxx
 
 # Run the server

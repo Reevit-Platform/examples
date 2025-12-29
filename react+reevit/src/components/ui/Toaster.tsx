@@ -1,19 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CheckCircle, XCircle, Info, X } from 'lucide-react'
-
-interface Toast {
-  id: string
-  message: string
-  type: 'success' | 'error' | 'info'
-}
-
-let toastHandler: ((message: string, type: Toast['type']) => void) | null = null
-
-export const toast = {
-  success: (message: string) => toastHandler?.(message, 'success'),
-  error: (message: string) => toastHandler?.(message, 'error'),
-  info: (message: string) => toastHandler?.(message, 'info'),
-}
+import { toastHandler, Toast } from './toast'
 
 export function Toaster() {
   const [toasts, setToasts] = useState<Toast[]>([])
@@ -28,9 +15,9 @@ export function Toaster() {
   }
 
   useEffect(() => {
-    toastHandler = addToast
+    toastHandler.current = addToast
     return () => {
-      toastHandler = null
+      toastHandler.current = null
     }
   }, [])
 

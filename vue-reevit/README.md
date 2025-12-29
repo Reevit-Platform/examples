@@ -27,7 +27,7 @@ App runs at `http://localhost:3004`
 Copy `.env.example` to `.env.local`:
 
 ```bash
-VITE_REEVIT_PUBLIC_KEY=pk_test_xxx
+VITE_REEVIT_PUBLIC_KEY=pfk_test_xxx
 VITE_REEVIT_BASE_URL=http://localhost:8080
 ```
 

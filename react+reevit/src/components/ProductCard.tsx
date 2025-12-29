@@ -1,7 +1,7 @@
 import { Star, Plus } from 'lucide-react'
 import { Product, formatPrice } from '@/lib/products'
 import { useCart } from '@/contexts/CartContext'
-import { toast } from '@/components/ui/Toaster'
+import { toast } from './ui/toast'
 
 interface ProductCardProps {
   product: Product

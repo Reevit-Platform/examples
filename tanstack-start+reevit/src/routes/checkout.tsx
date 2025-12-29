@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { useMemo, useState } from 'react'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft02Icon, SecurityCheckIcon } from '@hugeicons/core-free-icons'
 import { ReevitCheckout } from '@reevit/react'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { useCart } from '../lib/cart'
 import { formatPrice } from '../lib/products'
 import { toast } from '../components/Toaster'
@@ -11,7 +12,6 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { Separator } from '../components/ui/separator'
-import { HugeiconsIcon } from '@hugeicons/react'
 
 const countries = [
   { code: 'GH', name: 'Ghana', currency: 'GHS' },

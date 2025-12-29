@@ -1,4 +1,4 @@
-import { HeadContent, Scripts, createRootRoute, Outlet } from '@tanstack/react-router'
+import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router'
 
 import { Header } from '../components/Header'
 import { Toaster } from '../components/Toaster'

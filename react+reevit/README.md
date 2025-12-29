@@ -41,7 +41,7 @@ The app will be available at `http://localhost:3002`.
 Create a `.env.local` file:
 
 ```bash
-VITE_REEVIT_PUBLIC_KEY=pk_test_your_public_key_here
+VITE_REEVIT_PUBLIC_KEY=pfk_test_your_public_key_here
 VITE_REEVIT_BASE_URL=http://localhost:8080
 ```
 
@@ -57,7 +57,7 @@ import { ReevitCheckout } from '@reevit/react';
 function CheckoutPage() {
   return (
     <ReevitCheckout
-      publicKey="pk_test_xxx"
+      publicKey="pfk_test_xxx"
       amount={15000} // Amount in smallest unit (pesewas)
       currency="GHS"
       email="customer@example.com"

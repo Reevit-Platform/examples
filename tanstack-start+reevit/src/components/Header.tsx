@@ -2,7 +2,7 @@
 
 import { Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ShoppingCart01Icon, User02Icon, Search01Icon } from '@hugeicons/core-free-icons'
+import { Search01Icon, ShoppingCart01Icon, User02Icon } from '@hugeicons/core-free-icons'
 import { useCart } from '../lib/cart'
 import { Button } from './ui/button'
 

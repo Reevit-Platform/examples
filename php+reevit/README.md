@@ -15,7 +15,7 @@ A PHP server demonstrating the Reevit PHP SDK for payment processing and webhook
 composer install
 
 # Set environment variables
-export REEVIT_API_KEY=pk_test_xxx
+export REEVIT_API_KEY=pfk_test_xxx
 export REEVIT_WEBHOOK_SECRET=whsec_xxx
 
 # Run the server

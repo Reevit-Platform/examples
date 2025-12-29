@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Cancel01Icon, CheckmarkCircle02Icon, AlertCircleIcon, InformationCircleIcon } from '@hugeicons/core-free-icons'
+import { AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, InformationCircleIcon } from '@hugeicons/core-free-icons'
 
 type ToastType = 'success' | 'error' | 'info'
 
@@ -12,7 +12,7 @@ interface Toast {
   message: string
 }
 
-let toastListeners: ((toast: Toast) => void)[] = []
+let toastListeners: Array<(toast: Toast) => void> = []
 
 export const toast = {
   success: (message: string) => {
@@ -30,12 +30,12 @@ export const toast = {
 }
 
 export function Toaster() {
-  const [toasts, setToasts] = useState<Toast[]>([])
+  const [toasts, setToasts] = useState<Array<Toast>>([])
 
-  const addToast = useCallback((toast: Toast) => {
-    setToasts((prev) => [...prev, toast])
+  const addToast = useCallback((t: Toast) => {
+    setToasts((prev) => [...prev, t])
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+      setToasts((prev) => prev.filter((item) => item.id !== t.id))
     }, 4000)
   }, [])
 

@@ -1,8 +1,8 @@
 'use client'
 
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft02Icon, ArrowRight02Icon, RemoveIcon, Add01Icon, Delete02Icon } from '@hugeicons/core-free-icons'
+import { Add01Icon, ArrowLeft02Icon, ArrowRight02Icon, Delete02Icon, RemoveIcon } from '@hugeicons/core-free-icons'
 import { useCart } from '../lib/cart'
 import { formatPrice } from '../lib/products'
 import { Button } from '../components/ui/button'

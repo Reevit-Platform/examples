@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useReducer, type ReactNode } from 'react'
+import {  createContext, useContext, useReducer } from 'react'
+import type {ReactNode} from 'react';
 import type { Product } from './products'
 
 export interface CartItem {
@@ -9,7 +10,7 @@ export interface CartItem {
 }
 
 interface CartState {
-  items: CartItem[]
+  items: Array<CartItem>
 }
 
 type CartAction =
@@ -19,7 +20,7 @@ type CartAction =
   | { type: 'CLEAR_CART' }
 
 const CartContext = createContext<{
-  items: CartItem[]
+  items: Array<CartItem>
   total: number
   itemCount: number
   addItem: (product: Product) => void

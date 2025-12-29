@@ -42,7 +42,7 @@ The app will be available at `http://localhost:3004`.
 </script>
 
 <ReevitCheckout
-  publicKey="pk_test_xxx"
+  publicKey="pfk_test_xxx"
   amount={15000}
   currency="GHS"
   email="customer@example.com"

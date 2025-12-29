@@ -50,10 +50,10 @@ Copy `.env.example` to `.env.local` in each example:
 
 ```bash
 # TanStack Start & Vue
-VITE_REEVIT_PUBLIC_KEY=pk_test_xxx
+VITE_REEVIT_PUBLIC_KEY=pfk_test_xxx
 VITE_REEVIT_BASE_URL=http://localhost:8080
 
 # Next.js  
-NEXT_PUBLIC_REEVIT_PUBLIC_KEY=pk_test_xxx
+NEXT_PUBLIC_REEVIT_PUBLIC_KEY=pfk_test_xxx
 NEXT_PUBLIC_REEVIT_BASE_URL=http://localhost:8080
 ```

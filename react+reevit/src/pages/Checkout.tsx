@@ -4,7 +4,7 @@ import { ArrowLeft, ShieldCheck } from 'lucide-react'
 import { ReevitCheckout } from '@reevit/react'
 import { useCart } from '@/contexts/CartContext'
 import { formatPrice } from '@/lib/products'
-import { toast } from '@/components/ui/Toaster'
+import { toast } from '@/components/ui/toast'
 
 const countries = [
   { code: 'GH', name: 'Ghana', currency: 'GHS' },
@@ -39,14 +39,16 @@ export default function Checkout() {
     )
   }
 
-  const handlePaymentSuccess = (result: any) => {
+  const handlePaymentSuccess = (result: unknown) => {
     toast.success('Payment successful!')
     clearCart()
-    navigate(`/payment/${result.reference || result.id}`)
+    const id = (result as { reference?: string; id?: string }).reference || (result as { reference?: string; id?: string }).id || 'unknown'
+    navigate(`/payment/${id}`)
   }
 
-  const handlePaymentError = (error: any) => {
-    toast.error(error.message || 'Payment failed')
+  const handlePaymentError = (error: unknown) => {
+    const message = error instanceof Error ? error.message : 'Payment failed'
+    toast.error(message)
   }
 
   return (

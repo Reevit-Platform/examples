@@ -12,7 +12,7 @@ A Go server demonstrating the Reevit Go SDK for payment processing and webhook h
 
 ```bash
 # Set environment variables
-export REEVIT_API_KEY=pk_test_xxx
+export REEVIT_API_KEY=pfk_test_xxx
 export REEVIT_WEBHOOK_SECRET=whsec_xxx
 
 # Run the server

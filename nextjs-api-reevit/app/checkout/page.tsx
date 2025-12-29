@@ -87,8 +87,9 @@ export default function CheckoutPage() {
       toast.success('Payment initiated via API!')
       clearCart()
       router.push(`/payment/${data.id || 'success'}`)
-    } catch (error: any) {
-      toast.error(error.message || 'Checkout failed')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Checkout failed'
+      toast.error(message)
     } finally {
       setLoading(false)
     }
