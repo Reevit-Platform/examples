@@ -21,13 +21,14 @@ export default function Checkout() {
 
   const selectedCountryData = countries.find((c) => c.code === selectedCountry)
   const publicKey = import.meta.env.VITE_REEVIT_PUBLIC_KEY || 'pk_test_demo'
+  const [orderId] = useState(() => `ORD-${Date.now()}`)
 
   if (items.length === 0) {
     return (
       <main className="container mx-auto px-6 py-24 text-center">
         <div className="text-6xl mb-6">🛒</div>
         <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
-        <p className="text-[var(--color-muted-foreground)] mb-8">
+        <p className="text-muted-foreground mb-8">
           Add some products before checking out
         </p>
         <Link to="/" className="btn btn-primary h-12 px-8 text-lg">
@@ -64,7 +65,7 @@ export default function Checkout() {
             <h2 className="text-2xl font-bold mb-6">Customer Information</h2>
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-[var(--color-muted-foreground)] mb-2">
+                <label className="block text-sm font-bold text-muted-foreground mb-2">
                   Full Name
                 </label>
                 <input
@@ -77,7 +78,7 @@ export default function Checkout() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-[var(--color-muted-foreground)] mb-2">
+                <label className="block text-sm font-bold text-muted-foreground mb-2">
                   Email Address
                 </label>
                 <input
@@ -91,7 +92,7 @@ export default function Checkout() {
               </div>
             </div>
             <div className="mt-6">
-              <label className="block text-sm font-bold text-[var(--color-muted-foreground)] mb-2">
+              <label className="block text-sm font-bold text-muted-foreground mb-2">
                 Country
               </label>
               <select
@@ -100,7 +101,7 @@ export default function Checkout() {
                 className="input appearance-none cursor-pointer"
               >
                 {countries.map((country) => (
-                  <option key={country.code} value={country.code} className="bg-[#0a0a0f]">
+                  <option key={country.code} value={country.code} className="bg-background">
                     {country.name} ({country.currency})
                   </option>
                 ))}
@@ -109,15 +110,15 @@ export default function Checkout() {
           </section>
 
           {/* Reevit Info */}
-          <div className="glass p-6 rounded-2xl border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5">
+          <div className="glass p-6 rounded-2xl border border-accent/20 bg-accent/5">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-6 h-6 text-[var(--color-accent)]" />
+              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <h3 className="text-lg font-bold mb-1">Secure Checkout</h3>
-                <p className="text-sm text-[var(--color-muted-foreground)]">
-                  Your payment is securely processed through <span className="text-[var(--color-foreground)] font-semibold">Reevit's</span> unified payment platform. We automatically route to the best provider for your transaction.
+                <p className="text-sm text-muted-foreground">
+                  Your payment is securely processed through <span className="text-foreground font-semibold">Reevit's</span> unified payment platform. We automatically route to the best provider for your transaction.
                 </p>
               </div>
             </div>
@@ -142,7 +143,7 @@ export default function Checkout() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm line-clamp-1">{item.product.name}</p>
-                    <p className="text-xs text-[var(--color-muted-foreground)]">
+                    <p className="text-xs text-muted-foreground">
                       Qty: {item.quantity}
                     </p>
                   </div>
@@ -153,22 +154,22 @@ export default function Checkout() {
               ))}
             </div>
 
-            <div className="h-px bg-[var(--color-border)] my-6" />
+            <div className="h-px bg-border my-6" />
 
             {/* Totals */}
             <div className="space-y-3 mb-8">
-              <div className="flex justify-between text-sm text-[var(--color-muted-foreground)]">
+              <div className="flex justify-between text-sm text-muted-foreground">
                 <span>Subtotal</span>
-                <span className="text-[var(--color-foreground)]">{formatPrice(total)}</span>
+                <span className="text-foreground">{formatPrice(total)}</span>
               </div>
-              <div className="flex justify-between text-sm text-[var(--color-muted-foreground)]">
+              <div className="flex justify-between text-sm text-muted-foreground">
                 <span>Shipping</span>
-                <span className="text-[var(--color-success)] font-bold">Free</span>
+                <span className="text-success font-bold">Free</span>
               </div>
-              <div className="h-px bg-[var(--color-border)]" />
+              <div className="h-px bg-border" />
               <div className="flex justify-between">
                 <span className="font-bold">Total</span>
-                <span className="text-xl font-extrabold text-[var(--color-accent)]">
+                <span className="text-xl font-extrabold text-accent">
                   {formatPrice(total, selectedCountryData?.currency)}
                 </span>
               </div>
@@ -180,7 +181,7 @@ export default function Checkout() {
               amount={total}
               currency={selectedCountryData?.currency || 'GHS'}
               email={customerEmail}
-              reference={`ORD-${Date.now()}`}
+              reference={orderId}
               metadata={{
                 customer_name: customerName,
                 order_items: items.map((i) => i.product.id).join(','),
@@ -189,7 +190,7 @@ export default function Checkout() {
                 org_id: import.meta.env.VITE_REEVIT_ORG_ID || "your-organization-id",
                 connection_id: import.meta.env.VITE_REEVIT_CONNECTION_ID || "your-connection-id",
                 // payment_id is typically the order/invoice ID from your system
-                payment_id: `ORD-${Date.now()}`
+                payment_id: orderId
               }}
               paymentMethods={['card', 'mobile_money']}
               onSuccess={handlePaymentSuccess}
@@ -204,7 +205,7 @@ export default function Checkout() {
               </button>
             </ReevitCheckout>
 
-            <p className="mt-6 text-xs text-center text-[var(--color-muted-foreground)]">
+            <p className="mt-6 text-xs text-center text-muted-foreground">
               🔒 100% Encrypted & Secure
             </p>
           </div>

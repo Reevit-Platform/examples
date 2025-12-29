@@ -32,7 +32,7 @@
   <main class="container mx-auto px-6 py-24 text-center">
     <div class="text-6xl mb-6">🛒</div>
     <h1 class="text-3xl font-bold mb-4">Your cart is empty</h1>
-    <p class="text-[var(--color-muted-foreground)] mb-8">Add some products before checking out</p>
+    <p class="text-muted-foreground mb-8">Add some products before checking out</p>
     <a href="#/" class="btn btn-primary h-12 px-8 text-lg">
       <ArrowLeft class="w-5 h-5 mr-2" /> Continue Shopping
     </a>
@@ -52,33 +52,33 @@
           <h2 class="text-2xl font-bold mb-6">Customer Information</h2>
           <div class="grid sm:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-bold text-[var(--color-muted-foreground)] mb-2">Full Name</label>
+              <label class="block text-sm font-bold text-muted-foreground mb-2">Full Name</label>
               <input bind:value={customerName} type="text" placeholder="John Doe" class="input" required />
             </div>
             <div>
-              <label class="block text-sm font-bold text-[var(--color-muted-foreground)] mb-2">Email Address</label>
+              <label class="block text-sm font-bold text-muted-foreground mb-2">Email Address</label>
               <input bind:value={customerEmail} type="email" placeholder="john@example.com" class="input" required />
             </div>
           </div>
           <div class="mt-6">
-            <label class="block text-sm font-bold text-[var(--color-muted-foreground)] mb-2">Country</label>
+            <label class="block text-sm font-bold text-muted-foreground mb-2">Country</label>
             <select bind:value={selectedCountry} class="input appearance-none cursor-pointer">
               {#each countries as country (country.code)}
-                <option value={country.code} class="bg-[#0a0a0f]">{country.name} ({country.currency})</option>
+                <option value={country.code} class="bg-background">{country.name} ({country.currency})</option>
               {/each}
             </select>
           </div>
         </section>
 
-        <div class="glass p-6 rounded-2xl border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5">
+        <div class="glass p-6 rounded-2xl border border-accent/20 bg-accent/5">
           <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center shrink-0">
-              <ShieldCheck class="w-6 h-6 text-[var(--color-accent)]" />
+            <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+              <ShieldCheck class="w-6 h-6 text-accent" />
             </div>
             <div>
               <h3 class="text-lg font-bold mb-1">Secure Checkout</h3>
-              <p class="text-sm text-[var(--color-muted-foreground)]">
-                Your payment is securely processed through <span class="text-[var(--color-foreground)] font-semibold">Reevit's</span> unified payment platform.
+              <p class="text-sm text-muted-foreground">
+                Your payment is securely processed through <span class="text-foreground font-semibold">Reevit's</span> unified payment platform.
               </p>
             </div>
           </div>
@@ -96,26 +96,26 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="font-medium text-sm line-clamp-1">{item.product.name}</p>
-                  <p class="text-xs text-[var(--color-muted-foreground)]">Qty: {item.quantity}</p>
+                  <p class="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
                 <span class="font-bold text-sm">{formatPrice(item.product.price * item.quantity)}</span>
               </div>
             {/each}
           </div>
-          <div class="h-px bg-[var(--color-border)] my-6"></div>
+          <div class="h-px bg-border my-6"></div>
           <div class="space-y-3 mb-8">
-            <div class="flex justify-between text-sm text-[var(--color-muted-foreground)]">
+            <div class="flex justify-between text-sm text-muted-foreground">
               <span>Subtotal</span>
-              <span class="text-[var(--color-foreground)]">{formatPrice(cart.total)}</span>
+              <span class="text-foreground">{formatPrice(cart.total)}</span>
             </div>
-            <div class="flex justify-between text-sm text-[var(--color-muted-foreground)]">
+            <div class="flex justify-between text-sm text-muted-foreground">
               <span>Shipping</span>
-              <span class="text-[var(--color-success)] font-bold">Free</span>
+              <span class="text-success font-bold">Free</span>
             </div>
-            <div class="h-px bg-[var(--color-border)]"></div>
+            <div class="h-px bg-border"></div>
             <div class="flex justify-between">
               <span class="font-bold">Total</span>
-              <span class="text-xl font-extrabold text-[var(--color-accent)]">
+              <span class="text-xl font-extrabold text-accent">
                 {formatPrice(cart.total, selectedCountryData?.currency)}
               </span>
             </div>
@@ -147,7 +147,7 @@
             </button>
           </ReevitCheckout>
 
-          <p class="mt-6 text-xs text-center text-[var(--color-muted-foreground)]">🔒 100% Encrypted & Secure</p>
+          <p class="mt-6 text-xs text-center text-muted-foreground">🔒 100% Encrypted & Secure</p>
         </div>
       </div>
     </div>
