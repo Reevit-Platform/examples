@@ -8,7 +8,7 @@
     <div class="inline-block mb-4">
       <span class="badge">Powered by Reevit</span>
     </div>
-    <h1 class="text-5xl font-extrabold mb-4 tracking-tight">
+    <h1 class="text-5xl font-extrabold mb-4  ">
       Premium <span class="gradient-accent bg-clip-text text-transparent">Electronics</span>
     </h1>
     <p class="text-lg text-[var(--color-muted-foreground)] max-w-2xl mx-auto">

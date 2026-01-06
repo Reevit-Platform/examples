@@ -9,7 +9,7 @@ export default function Home() {
         <div className="inline-block mb-4">
           <span className="badge">Powered by Reevit</span>
         </div>
-        <h1 className="text-5xl font-extrabold mb-4 tracking-tight">
+        <h1 className="text-5xl font-extrabold mb-4  ">
           Premium <span className="gradient-accent bg-clip-text text-transparent">Electronics</span>
         </h1>
         <p className="text-lg text-[var(--color-muted-foreground)] max-w-2xl mx-auto">
