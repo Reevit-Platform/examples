@@ -1,0 +1,57 @@
+name: Checkout contracts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - run: go test ./...
+        working-directory: go+reevit
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+        working-directory: python+reevit
+      - run: python -m unittest test_checkout -v
+        working-directory: python+reevit
+
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+      - run: composer install --no-interaction --no-scripts --no-plugins --prefer-dist
+        working-directory: php+reevit
+      - run: composer validate --no-check-publish && php tests/checkout.php
+        working-directory: php+reevit
+
+  http:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: nextjs-api-reevit/package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+        working-directory: nextjs-api-reevit
+      - run: npm test && npx tsc --noEmit && npm run build
+        working-directory: nextjs-api-reevit

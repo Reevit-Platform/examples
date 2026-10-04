@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon, SecurityCheckIcon } from '@hugeicons/core-free-icons'
 import { useCart } from '@/lib/cart'
+import { createPaymentIntent } from '@/lib/checkout'
 import { formatPrice } from '@/lib/products'
 import { toast } from '@/components/Toaster'
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,8 @@ export default function CheckoutPage() {
   const [customerName, setCustomerName] = useState('')
   const [selectedCountry, setSelectedCountry] = useState('GH')
   const [loading, setLoading] = useState(false)
+  // One logical order keeps the same key when a network failure is retried.
+  const [orderId] = useState(() => `ORD-${crypto.randomUUID()}`)
 
   const selectedCountryData = countries.find((c) => c.code === selectedCountry)
 
@@ -52,16 +55,8 @@ export default function CheckoutPage() {
     }
 
     setLoading(true)
-    const orderId = `ORD-${Date.now()}`
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_REEVIT_BASE_URL || 'http://localhost:8080'}/v1/payments/intents`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Reevit-Key': process.env.NEXT_PUBLIC_REEVIT_PUBLIC_KEY || 'pfk_test_demo',
-          'X-Org-Id': process.env.NEXT_PUBLIC_REEVIT_ORG_ID || 'your-org-id',
-        },
-        body: JSON.stringify({
+      const data = await createPaymentIntent({
           amount: total,
           currency: selectedCountryData?.currency || 'GHS',
           method: 'card',
@@ -75,14 +70,7 @@ export default function CheckoutPage() {
             connection_id: process.env.NEXT_PUBLIC_REEVIT_CONNECTION_ID || "your-connection-id",
             payment_id: orderId
           },
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to initiate checkout')
-      }
+      }, `checkout:${orderId}`)
 
       toast.success('Payment initiated via API!')
       clearCart()

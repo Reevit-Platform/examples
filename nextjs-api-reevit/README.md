@@ -16,6 +16,23 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Reevit checkout requests
+
+Set `NEXT_PUBLIC_REEVIT_BASE_URL`, `NEXT_PUBLIC_REEVIT_PUBLIC_KEY`, and
+`NEXT_PUBLIC_REEVIT_ORG_ID` for your test account. Each mounted checkout page
+holds one order reference and sends `Idempotency-Key: checkout:<order>`.
+Retries preserve that key and the payload; begin a new checkout for a new
+order. Reevit amounts use the smallest currency unit (`5000` GHS is GHS 50.00).
+
+```bash
+npm ci --ignore-scripts
+npm test
+npm run build
+```
+
+The request test calls a local canary API and checks the actual HTTP headers
+and retry payload. It does not run a provider payment.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

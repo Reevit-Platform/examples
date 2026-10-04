@@ -1,7 +1,6 @@
 import os
 import logging
-import time
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from dotenv import load_dotenv
 
 from models import CreatePaymentRequest, PaymentResponse
@@ -30,7 +29,7 @@ api_key = os.getenv("REEVIT_API_KEY", "pfk_test_demo")
 # Initialize Reevit client
 try:
     from reevit import Reevit
-    client = Reevit(api_key=api_key)
+    client = Reevit(api_key=api_key, org_id=os.getenv("REEVIT_ORG_ID"), base_url=os.getenv("REEVIT_BASE_URL"))
 except ImportError:
     logger.warning("Reevit SDK not installed. Using mock client.")
     client = None
@@ -43,14 +42,17 @@ async def health_check():
 
 
 @app.post("/api/payments", response_model=PaymentResponse)
-async def create_payment(request: CreatePaymentRequest):
+async def create_payment(request: CreatePaymentRequest, idempotency_key: str = Header(default="", alias="Idempotency-Key")):
     """Create a new payment intent."""
+    idempotency_key = idempotency_key.strip()
+    if not idempotency_key:
+        raise HTTPException(status_code=400, detail="Idempotency-Key header is required")
     if not client:
         raise HTTPException(status_code=503, detail="Reevit SDK not available")
     
     try:
         # Generate reference if not provided
-        order_id = request.reference or f"ORD-{int(time.time())}"
+        order_id = request.reference or idempotency_key
         
         # Ensure metadata includes required fields for webhook routing
         metadata = request.metadata or {}
@@ -65,7 +67,7 @@ async def create_payment(request: CreatePaymentRequest):
             "customer_id": request.customer_id,
             "reference": order_id,
             "metadata": metadata
-        })
+        }, idempotency_key=idempotency_key)
         
         logger.info(f"[Payment] Created: {payment['id']} (Status: {payment['status']})")
         

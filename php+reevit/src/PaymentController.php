@@ -10,21 +10,25 @@ class PaymentController
 
     public function __construct(string $apiKey)
     {
-        $this->client = new Reevit($apiKey);
+        $this->client = new Reevit($apiKey, getenv('REEVIT_ORG_ID') ?: null, getenv('REEVIT_BASE_URL') ?: null);
     }
 
     /**
      * Create a payment intent
      */
-    public function create(array $data): array
+    public function create(array $data, string $idempotencyKey): array
     {
+        $idempotencyKey = trim($idempotencyKey);
+        if ($idempotencyKey === '') {
+            throw new \InvalidArgumentException('Idempotency-Key header is required');
+        }
         // Validate required fields
         if (!isset($data['amount']) || $data['amount'] <= 0) {
             throw new \InvalidArgumentException('Amount is required and must be positive');
         }
 
         // Generate reference if not provided
-        $reference = $data['reference'] ?? 'ORD-' . time();
+        $reference = $data['reference'] ?? $idempotencyKey;
 
         // Ensure metadata includes required fields for webhook routing
         $metadata = $data['metadata'] ?? [];
@@ -40,7 +44,7 @@ class PaymentController
             'customer_id' => $data['customer_id'] ?? null,
             'reference' => $reference,
             'metadata' => $metadata,
-        ]);
+        ], $idempotencyKey);
 
         error_log("[Payment] Created: {$payment['id']} (Status: {$payment['status']})");
 
