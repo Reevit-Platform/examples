@@ -3,10 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"time"
+	"strings"
 
 	reevit "github.com/Reevit-Platform/go-sdk"
 )
@@ -38,6 +37,11 @@ type CreatePaymentRequest struct {
 
 // CreatePayment handles POST /api/payments
 func (s *Server) CreatePayment(w http.ResponseWriter, r *http.Request) {
+	idempotencyKey := strings.TrimSpace(r.Header.Get("Idempotency-Key"))
+	if idempotencyKey == "" {
+		http.Error(w, `{"error": "Idempotency-Key header is required"}`, http.StatusBadRequest)
+		return
+	}
 	var req CreatePaymentRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
@@ -67,13 +71,13 @@ func (s *Server) CreatePayment(w http.ResponseWriter, r *http.Request) {
 
 	// Ensure payment_id in metadata matches reference
 	if req.Reference == "" {
-		req.Reference = fmt.Sprintf("ORD-%d", time.Now().Unix())
+		req.Reference = idempotencyKey
 	}
 	metadata["payment_id"] = req.Reference
 	metadata["org_id"] = s.orgID // Ensure org_id is present for webhook routing
 
 	// Create payment intent via Reevit SDK
-	payment, err := s.client.Payments.CreateIntent(context.Background(), &reevit.PaymentIntentRequest{
+	payment, err := s.client.Payments.CreateIntent(r.Context(), &reevit.PaymentIntentRequest{
 		Amount:     req.Amount,
 		Currency:   req.Currency,
 		Method:     req.Method,
@@ -81,7 +85,7 @@ func (s *Server) CreatePayment(w http.ResponseWriter, r *http.Request) {
 		CustomerID: req.CustomerID,
 		Reference:  req.Reference,
 		Metadata:   metadata,
-	})
+	}, reevit.WithIdempotencyKey(idempotencyKey))
 	if err != nil {
 		log.Printf("[Payment] Error creating payment: %v", err)
 		http.Error(w, `{"error": "Failed to create payment"}`, http.StatusInternalServerError)

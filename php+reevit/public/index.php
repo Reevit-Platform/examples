@@ -9,7 +9,7 @@ use App\WebhookController;
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, Idempotency-Key');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -36,7 +36,7 @@ try {
     // Create payment
     elseif ($path === '/api/payments' && $method === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
-        $result = $paymentController->create($input);
+        $result = $paymentController->create($input, $_SERVER['HTTP_IDEMPOTENCY_KEY'] ?? '');
         echo json_encode($result);
     }
     // Get payment by ID
@@ -61,6 +61,9 @@ try {
         http_response_code(404);
         echo json_encode(['error' => 'Not found']);
     }
+} catch (InvalidArgumentException $e) {
+    http_response_code(400);
+    echo json_encode(['error' => $e->getMessage()]);
 } catch (Exception $e) {
     error_log("[Error] " . $e->getMessage());
     http_response_code(500);

@@ -6,7 +6,7 @@ A PHP server demonstrating the Reevit PHP SDK for payment processing and webhook
 
 - 💳 **Payment API** - Create, get, list payments
 - 🔒 **Webhook Handler** - With HMAC signature verification
-- 🐘 **PHP 8+** - Modern PHP syntax
+- 🐘 **PHP 8.1+** - Modern PHP syntax
 
 ## Quick Start
 
@@ -16,6 +16,7 @@ composer install
 
 # Set environment variables
 export REEVIT_API_KEY=pfk_test_xxx
+export REEVIT_ORG_ID=org_xxx
 export REEVIT_WEBHOOK_SECRET=whsec_xxx
 
 # Run the server
@@ -35,13 +36,17 @@ Server runs at `http://localhost:8083`.
 
 ## Create Payment Example
 
+Use one `Idempotency-Key` per logical order. Reuse it with the same payload on retries; use a new key for a new order. The examples forward that key to Reevit. Amounts use the currency's smallest unit: `5000` GHS means GHS 50.00.
+
+
 ```bash
 curl -X POST http://localhost:8083/api/payments \
   -H "Content-Type: application/json" \
+  -H "Idempotency-Key: checkout:order_123" \
   -d '{
     "amount": 5000,
     "currency": "GHS",
-    "method": "momo",
+    "method": "mobile_money",
     "country": "GH",
     "metadata": {"order_id": "123"}
   }'
@@ -63,3 +68,10 @@ php+reevit/
 
 - [Reevit PHP SDK](../../sdks/php/README.md)
 - [Reevit Documentation](https://docs.reevit.io)
+
+## Verify the checkout contract
+
+```bash
+composer validate --no-check-publish
+php tests/checkout.php
+```

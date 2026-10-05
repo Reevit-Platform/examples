@@ -1,7 +1,5 @@
 module go-reevit-example
 
-go 1.21
+go 1.22.5
 
-require github.com/Reevit-Platform/go-sdk v0.3.2
-
-replace github.com/Reevit-Platform/go-sdk => ../../sdks/go
+require github.com/Reevit-Platform/go-sdk v0.11.0

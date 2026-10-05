@@ -13,6 +13,7 @@ A Go server demonstrating the Reevit Go SDK for payment processing and webhook h
 ```bash
 # Set environment variables
 export REEVIT_API_KEY=pfk_test_xxx
+export REEVIT_ORG_ID=org_xxx
 export REEVIT_WEBHOOK_SECRET=whsec_xxx
 
 # Run the server
@@ -32,13 +33,17 @@ Server runs at `http://localhost:8081`.
 
 ## Create Payment Example
 
+Use one `Idempotency-Key` per logical order. Reuse it with the same payload on retries; use a new key for a new order. The examples forward that key to Reevit. Amounts use the currency's smallest unit: `5000` GHS means GHS 50.00.
+
+
 ```bash
 curl -X POST http://localhost:8081/api/payments \
   -H "Content-Type: application/json" \
+  -H "Idempotency-Key: checkout:order_123" \
   -d '{
     "amount": 5000,
     "currency": "GHS",
-    "method": "momo",
+    "method": "mobile_money",
     "country": "GH",
     "metadata": {"order_id": "123"}
   }'
@@ -55,3 +60,9 @@ The server handles:
 
 - [Reevit Go SDK](../../sdks/go/README.md)
 - [Reevit Documentation](https://docs.reevit.io)
+
+## Verify the checkout contract
+
+```bash
+go test ./...
+```

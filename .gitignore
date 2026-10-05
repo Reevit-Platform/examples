@@ -1,0 +1,9 @@
+node_modules/
+vendor/
+.venv/
+__pycache__/
+*.pyc
+.next/
+.test-build/
+.env
+.env.local
