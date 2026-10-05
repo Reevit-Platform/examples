@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon, SecurityCheckIcon } from '@hugeicons/core-free-icons'
-import { useCart } from '@/lib/cart'
-import { createPaymentIntent } from '@/lib/checkout'
+import { useCart, type CartItem } from '@/lib/cart'
+import { createPaymentIntent, type CheckoutIntentRequest } from '@/lib/checkout'
 import { formatPrice } from '@/lib/products'
 import { toast } from '@/components/Toaster'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,12 @@ const countries = [
   { code: 'KE', name: 'Kenya', currency: 'KES' },
 ]
 
+interface SubmittedOrder {
+  idempotencyKey: string
+  payload: CheckoutIntentRequest
+  items: CartItem[]
+}
+
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, total, clearCart } = useCart()
@@ -29,10 +35,14 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   // One logical order keeps the same key when a network failure is retried.
   const [orderId] = useState(() => `ORD-${crypto.randomUUID()}`)
+  const [submittedOrder, setSubmittedOrder] = useState<SubmittedOrder | null>(null)
 
   const selectedCountryData = countries.find((c) => c.code === selectedCountry)
+  const displayItems = submittedOrder?.items ?? items
+  const displayTotal = submittedOrder?.payload.amount ?? total
+  const displayCurrency = submittedOrder?.payload.currency ?? selectedCountryData?.currency
 
-  if (items.length === 0) {
+  if (displayItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-24 text-center">
         <div className="text-8xl mb-6">🛒</div>
@@ -49,14 +59,19 @@ export default function CheckoutPage() {
   }
 
   const handleCheckout = async () => {
-    if (!customerEmail || !customerName) {
+    if (!submittedOrder && (!customerEmail || !customerName)) {
       toast.error('Please fill in your details')
       return
     }
 
     setLoading(true)
     try {
-      const data = await createPaymentIntent({
+      // Retain the entire first request: an ambiguous failure may have already
+      // created the payment, so a retry must not rebuild it from mutable inputs.
+      const order = submittedOrder ?? {
+        idempotencyKey: `checkout:${orderId}`,
+        items: items.map((item) => ({ ...item, product: { ...item.product } })),
+        payload: {
           amount: total,
           currency: selectedCountryData?.currency || 'GHS',
           method: 'card',
@@ -70,7 +85,10 @@ export default function CheckoutPage() {
             connection_id: process.env.NEXT_PUBLIC_REEVIT_CONNECTION_ID || "your-connection-id",
             payment_id: orderId
           },
-      }, `checkout:${orderId}`)
+        },
+      }
+      setSubmittedOrder(order)
+      const data = await createPaymentIntent(order.payload, order.idempotencyKey)
 
       toast.success('Payment initiated via API!')
       clearCart()
@@ -103,35 +121,47 @@ export default function CheckoutPage() {
             <CardContent className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                  <label htmlFor="checkout-name" className="text-sm font-medium text-muted-foreground mb-2 block">
                     Full Name
                   </label>
                   <Input
+                    id="checkout-name"
                     type="text"
+                    name="customerName"
+                    autoComplete="name"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
+                    disabled={submittedOrder !== null}
                     placeholder="John Doe"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                  <label htmlFor="checkout-email" className="text-sm font-medium text-muted-foreground mb-2 block">
                     Email Address
                   </label>
                   <Input
+                    id="checkout-email"
                     type="email"
+                    name="customerEmail"
+                    autoComplete="email"
+                    spellCheck={false}
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
+                    disabled={submittedOrder !== null}
                     placeholder="john@example.com"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                <label htmlFor="checkout-country" className="text-sm font-medium text-muted-foreground mb-2 block">
                   Country
                 </label>
                 <select
+                  id="checkout-country"
+                  name="country"
                   value={selectedCountry}
                   onChange={(e) => setSelectedCountry(e.target.value)}
+                  disabled={submittedOrder !== null}
                   className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
                 >
                   {countries.map((country) => (
@@ -166,7 +196,7 @@ export default function CheckoutPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                {items.map((item) => (
+                {displayItems.map((item) => (
                   <div key={item.product.id} className="flex items-center gap-3">
                     <img
                       src={item.product.image}
@@ -191,7 +221,7 @@ export default function CheckoutPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>{formatPrice(displayTotal, displayCurrency)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
@@ -201,7 +231,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between">
                   <span className="font-bold">Total</span>
                   <span className="text-xl font-bold text-primary">
-                    {formatPrice(total, selectedCountryData?.currency)}
+                    {formatPrice(displayTotal, displayCurrency)}
                   </span>
                 </div>
               </div>
@@ -212,8 +242,16 @@ export default function CheckoutPage() {
                 onClick={handleCheckout}
                 disabled={loading}
               >
-                {loading ? 'Processing...' : `Pay ${formatPrice(total, selectedCountryData?.currency)}`}
+                {loading ? 'Processing…' : `${submittedOrder ? 'Retry' : 'Pay'} ${formatPrice(displayTotal, displayCurrency)}`}
               </Button>
+
+              {submittedOrder && (
+                <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
+                  Your order details are locked. If the request fails, retry this
+                  order to check its payment. Confirm its status before starting
+                  another order.
+                </p>
+              )}
 
               <p className="text-xs text-center text-muted-foreground">
                 🔒 100% Encrypted & Secure

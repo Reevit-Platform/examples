@@ -20,8 +20,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Set `NEXT_PUBLIC_REEVIT_BASE_URL`, `NEXT_PUBLIC_REEVIT_PUBLIC_KEY`, and
 `NEXT_PUBLIC_REEVIT_ORG_ID` for your test account. Each mounted checkout page
-holds one order reference and sends `Idempotency-Key: checkout:<order>`.
-Retries preserve that key and the payload; begin a new checkout for a new
+holds one order reference and sends `Idempotency-Key: checkout:<order>`. The first
+submission saves the complete request and order summary and locks the customer
+and country fields. Retries send that saved payload even if the cart changes.
+Confirm the original payment's status before beginning a new checkout for a new
 order. Reevit amounts use the smallest currency unit (`5000` GHS is GHS 50.00).
 
 ```bash
@@ -30,8 +32,12 @@ npm test
 npm run build
 ```
 
-The request test calls a local canary API and checks the actual HTTP headers
-and retry payload. It does not run a provider payment.
+The request tests call a local canary API and check the actual HTTP headers and
+retry payload. The page regression test invokes the actual checkout page's event
+handlers with a stubbed React state/JSX boundary, changes its inputs and cart
+after an ambiguous response failure, and verifies the retained order and locked
+controls. Browser verification covers the rendered controls separately. These
+checks do not run a provider payment.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
