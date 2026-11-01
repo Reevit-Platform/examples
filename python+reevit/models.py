@@ -24,16 +24,22 @@ class PaymentResponse(BaseModel):
 
 
 class WebhookEvent(BaseModel):
-    id: str
-    type: str
+    event: Optional[str] = None
+    type: Optional[str] = None  # legacy envelope (`reevit listen` fallback)
+    delivery_id: Optional[str] = None
     org_id: Optional[str] = None
-    created_at: Optional[str] = None
+    mode: Optional[str] = None
+    timestamp: Optional[str] = None
     data: Optional[Dict] = None
     message: Optional[str] = None
+
+    def name(self) -> Optional[str]:
+        return self.event or self.type
 
 
 class PaymentEventData(BaseModel):
     id: str
+    payment_id: Optional[str] = None
     status: str
     amount: int
     currency: str

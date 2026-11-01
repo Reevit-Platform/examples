@@ -42,30 +42,29 @@ async def handle_webhook(request: Request):
     event_data = await request.json()
     event = WebhookEvent(**event_data)
     
-    logger.info(f"[Webhook] Received: {event.type} ({event.id})")
-    
-    # Handle different event types
-    if event.type == "reevit.webhook.test":
+    name = event.name()
+    logger.info(f"[Webhook] Received: {name} ({event.delivery_id})")
+
+    if name == "reevit.webhook.test":
         logger.info(f"[Webhook] Test event: {event.message}")
-    
-    elif event.type == "payment.succeeded":
+
+    elif name == "payment.updated":
+        # A terminal outcome arrives as payment.updated with the result in
+        # data["status"]. There is no payment.succeeded / payment.failed event.
         if event.data:
             data = PaymentEventData(**event.data)
-            handle_payment_succeeded(data)
-    
-    elif event.type == "payment.failed":
+            if data.status == "succeeded":
+                handle_payment_succeeded(data)
+            elif data.status == "failed":
+                handle_payment_failed(data)
+
+    elif name == "refund.succeeded":
         if event.data:
-            data = PaymentEventData(**event.data)
-            handle_payment_failed(data)
-    
-    elif event.type == "payment.refunded":
-        if event.data:
-            data = PaymentEventData(**event.data)
-            handle_payment_refunded(data)
-    
+            handle_payment_refunded(PaymentEventData(**event.data))
+
     else:
-        logger.info(f"[Webhook] Unhandled event: {event.type}")
-    
+        logger.info(f"[Webhook] Unhandled event: {name}")
+
     return {"received": True}
 
 
@@ -92,7 +91,7 @@ def handle_payment_failed(data: PaymentEventData):
 def handle_payment_refunded(data: PaymentEventData):
     """Handle refunded payment."""
     order_id = data.metadata.get("order_id") if data.metadata else None
-    logger.info(f"[Webhook] 💰 Payment refunded: {data.id} for order {order_id}")
+    logger.info(f"[Webhook] 💰 Refund succeeded: {data.id} for payment {data.payment_id} (order {order_id})")
     
     # TODO: Implement your business logic
     # - Update order status
