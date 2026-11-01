@@ -26,7 +26,7 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
         working-directory: python+reevit
-      - run: python -m unittest test_checkout -v
+      - run: python -m unittest test_checkout test_webhooks -v
         working-directory: python+reevit
 
   php:
@@ -39,7 +39,7 @@ jobs:
           tools: composer:v2
       - run: composer install --no-interaction --no-scripts --no-plugins --prefer-dist
         working-directory: php+reevit
-      - run: composer validate --no-check-publish && php tests/checkout.php
+      - run: composer validate --no-check-publish && php tests/checkout.php && php tests/webhooks.php
         working-directory: php+reevit
 
   http:
