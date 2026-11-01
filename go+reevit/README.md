@@ -52,9 +52,11 @@ curl -X POST http://localhost:8081/api/payments \
 ## Webhook Events
 
 The server handles:
-- `payment.succeeded` - Payment completed
-- `payment.failed` - Payment failed
-- `payment.refunded` - Payment refunded
+- `payment.updated` - Payment status changed (check `data.status`: `succeeded` or `failed`)
+- `refund.succeeded` - Refund completed
+- `reevit.webhook.test` - Test delivery
+
+See [all event types](https://docs.reevit.io/webhooks#event-types).
 
 ## Learn More
 
