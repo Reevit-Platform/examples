@@ -45,10 +45,11 @@ class WebhookController
             return ['error' => 'Invalid JSON'];
         }
 
-        $eventType = $event['type'] ?? 'unknown';
-        $eventId = $event['id'] ?? 'unknown';
+        // Production deliveries name the event in "event"; older payloads use "type".
+        $eventType = $event['event'] ?? $event['type'] ?? 'unknown';
+        $deliveryId = $event['delivery_id'] ?? 'unknown';
 
-        error_log("[Webhook] Received: {$eventType} ({$eventId})");
+        error_log("[Webhook] Received: {$eventType} ({$deliveryId})");
 
         // Handle different event types
         switch ($eventType) {
@@ -56,15 +57,18 @@ class WebhookController
                 error_log("[Webhook] Test event: " . ($event['message'] ?? ''));
                 break;
 
-            case 'payment.succeeded':
-                $this->handlePaymentSucceeded($event['data'] ?? []);
+            case 'payment.updated':
+                // A terminal outcome arrives as payment.updated with the result in
+                // data.status. There is no payment.succeeded / payment.failed event.
+                $status = $event['data']['status'] ?? null;
+                if ($status === 'succeeded') {
+                    $this->handlePaymentSucceeded($event['data']);
+                } elseif ($status === 'failed') {
+                    $this->handlePaymentFailed($event['data']);
+                }
                 break;
 
-            case 'payment.failed':
-                $this->handlePaymentFailed($event['data'] ?? []);
-                break;
-
-            case 'payment.refunded':
+            case 'refund.succeeded':
                 $this->handlePaymentRefunded($event['data'] ?? []);
                 break;
 
@@ -75,7 +79,7 @@ class WebhookController
         return ['received' => true];
     }
 
-    private function handlePaymentSucceeded(array $data): void
+    protected function handlePaymentSucceeded(array $data): void
     {
         $orderId = $data['metadata']['order_id'] ?? 'unknown';
         error_log("[Webhook] ✅ Payment succeeded: {$data['id']} for order {$orderId}");
@@ -86,7 +90,7 @@ class WebhookController
         // - Trigger fulfillment
     }
 
-    private function handlePaymentFailed(array $data): void
+    protected function handlePaymentFailed(array $data): void
     {
         error_log("[Webhook] ❌ Payment failed: {$data['id']}");
 
@@ -95,10 +99,11 @@ class WebhookController
         // - Notify customer
     }
 
-    private function handlePaymentRefunded(array $data): void
+    protected function handlePaymentRefunded(array $data): void
     {
         $orderId = $data['metadata']['order_id'] ?? 'unknown';
-        error_log("[Webhook] 💰 Payment refunded: {$data['id']} for order {$orderId}");
+        $data['payment_id'] ??= 'unknown';
+        error_log("[Webhook] 💰 Refund succeeded: {$data['id']} for payment {$data['payment_id']} (order {$orderId})");
 
         // TODO: Implement your business logic
         // - Update order status
